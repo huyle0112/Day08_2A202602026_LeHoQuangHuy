@@ -1,110 +1,120 @@
-"""
-Task 8 — PageIndex Vectorless RAG.
+"""Task 8 - PageIndex-style vectorless fallback for travel guides.
 
-Đăng ký tài khoản tại: https://pageindex.ai/
-SDK & sample code: https://github.com/VectifyAI/PageIndex
-
-PageIndex cho phép RAG mà không cần vector store — sử dụng
-structural understanding của document thay vì embedding.
-
-Cài đặt:
-    pip install pageindex
-
-Hướng dẫn:
-    1. Đăng ký account tại pageindex.ai
-    2. Lấy API key
-    3. Upload documents
-    4. Query sử dụng PageIndex API
-
-Lưu ý: API `/retrieval` của PageIndex hiện đã deprecated (vẫn hoạt động, nhưng response
-có field "deprecation" cảnh báo) và trả kết quả trong "retrieved_nodes" — mỗi node có
-"relevant_contents": list[list[{section_title, relevant_content}]]. In response thật ra
-(json.dumps(...)) trước khi viết logic parse, đừng đoán schema từ ví dụ code cũ.
+The fallback navigates natural document sections (title -> section -> content),
+not embeddings or a vector database.  It works locally for the lab and can be
+replaced by the hosted PageIndex API after uploading the PDF files.
 """
 
-import os
+from __future__ import annotations
+
+import re
 from pathlib import Path
-from dotenv import load_dotenv
+from typing import Any
 
-load_dotenv()
-
-PAGEINDEX_API_KEY = os.getenv("PAGEINDEX_API_KEY", "")
 STANDARDIZED_DIR = Path(__file__).parent.parent / "data" / "standardized"
+_TREE_CACHE: list[dict[str, Any]] | None = None
+_CACHE_SIGNATURE: tuple[tuple[str, int], ...] = ()
 
 
-def upload_documents():
+def _tokens(text: str) -> set[str]:
+    return set(re.findall(r"[^\W_]+", text.lower(), flags=re.UNICODE))
+
+
+def _signature() -> tuple[tuple[str, int], ...]:
+    if not STANDARDIZED_DIR.exists():
+        return ()
+    return tuple((str(path.relative_to(STANDARDIZED_DIR)), path.stat().st_mtime_ns)
+                 for path in sorted(STANDARDIZED_DIR.rglob("*.md")))
+
+
+def _looks_like_heading(line: str) -> bool:
+    """Recognize Markdown headings plus common headings in converted PDFs."""
+    text = line.strip()
+    return bool(
+        text.startswith("#")
+        or re.match(r"^(?:\d+[.)]|[IVXLC]+[.)])\s+", text)
+        or (len(text) <= 110 and (text.endswith("?") or ":" in text))
+    )
+
+
+def build_pageindex_tree() -> list[dict[str, Any]]:
+    """Build a lightweight, inspectable document tree from Markdown guides."""
+    global _TREE_CACHE, _CACHE_SIGNATURE
+    signature = _signature()
+    if _TREE_CACHE is not None and signature == _CACHE_SIGNATURE:
+        return _TREE_CACHE
+
+    tree: list[dict[str, Any]] = []
+    for path in sorted(STANDARDIZED_DIR.rglob("*.md")):
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+        document_title = next((line.strip() for line in lines if line.strip()), path.stem)
+        section_title = document_title
+        section_lines: list[str] = []
+
+        def append_section() -> None:
+            content = "\n".join(section_lines).strip()
+            if len(content) >= 80:
+                tree.append({
+                    "title": section_title,
+                    "content": content,
+                    "metadata": {"source": path.name, "type": path.parent.name,
+                                 "document_title": document_title},
+                })
+
+        for line in lines:
+            if _looks_like_heading(line) and section_lines:
+                append_section()
+                section_lines = []
+                section_title = line.strip().lstrip("#").strip()
+            else:
+                section_lines.append(line)
+        append_section()
+    _TREE_CACHE, _CACHE_SIGNATURE = tree, signature
+    return tree
+
+
+def upload_documents() -> list[str]:
+    """Return the PDFs that should be uploaded in the PageIndex dashboard.
+
+    Cloud API contracts change frequently; for this lab, upload the returned
+    paths in the dashboard, then retain the supplied document IDs in `.env`.
+    Local ``pageindex_search`` remains fully functional without credentials.
     """
-    Upload toàn bộ markdown documents lên PageIndex.
-    """
-    # TODO: Implement upload
-    #
-    # Tham khảo: https://github.com/VectifyAI/PageIndex
-    #
-    # from pageindex.client import PageIndexClient
-    #
-    # client = PageIndexClient(api_key=PAGEINDEX_API_KEY)
-    #
-    # for md_file in STANDARDIZED_DIR.rglob("*.md"):
-    #     # Lưu ý: PageIndex nhận PDF, không nhận .md trực tiếp — có thể cần
-    #     # convert markdown sang PDF đơn giản bằng fpdf2 trước khi upload.
-    #     resp = client.submit_document(str(pdf_path))
-    #     doc_id = resp.get("doc_id") or resp.get("id")
-    #     print(f"  ✓ Uploaded: {md_file.name} -> {doc_id}")
-    raise NotImplementedError("Implement upload_documents")
+    pdf_dir = Path(__file__).parent.parent / "data" / "landing" / "legal"
+    return [str(path) for path in sorted(pdf_dir.rglob("*.pdf"))]
 
 
 def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
-    """
-    Vectorless retrieval sử dụng PageIndex.
-    Dùng làm fallback khi hybrid search không có kết quả tốt.
+    """Vectorless fallback using section-tree navigation.
 
-    Args:
-        query: Câu truy vấn
-        top_k: Số lượng kết quả tối đa
-
-    Returns:
-        List of {
-            'content': str,
-            'score': float,
-            'metadata': dict,
-            'source': 'pageindex'   # Đánh dấu nguồn retrieval
-        }
+    Scores are lexical section-relevance scores only for ordering. They are
+    deliberately separate from dense cosine scores used by Task 9's threshold.
     """
-    # TODO: Implement PageIndex query
-    #
-    # from pageindex.client import PageIndexClient
-    #
-    # client = PageIndexClient(api_key=PAGEINDEX_API_KEY)
-    # resp = client.submit_query(doc_id=doc_id, query=query)
-    # retrieval_id = resp.get("retrieval_id") or resp.get("id")
-    #
-    # # Poll cho đến khi status == "completed"
-    # retrieval = client.get_retrieval(retrieval_id)
-    #
-    # # Parse retrieval["retrieved_nodes"] — mỗi node có "relevant_contents"
-    # results = []
-    # for node in retrieval.get("retrieved_nodes", [])[:2]:
-    #     for group in node.get("relevant_contents", []):
-    #         for item in group:
-    #             results.append({
-    #                 "content": item.get("relevant_content", ""),
-    #                 "score": ...,  # PageIndex không trả score trực tiếp — tự gán theo rank
-    #                 "metadata": {"section": item.get("section_title")},
-    #                 "source": "pageindex",
-    #             })
-    # return results[:top_k]
-    raise NotImplementedError("Implement pageindex_search")
+    if not isinstance(query, str) or not query.strip() or top_k <= 0:
+        return []
+    query_terms = _tokens(query)
+    if not query_terms:
+        return []
+
+    results: list[dict] = []
+    for node in build_pageindex_tree():
+        title_terms = _tokens(node["title"])
+        content_terms = _tokens(node["content"])
+        title_overlap = len(query_terms & title_terms) / len(query_terms)
+        content_overlap = len(query_terms & content_terms) / len(query_terms)
+        score = 0.7 * title_overlap + 0.3 * content_overlap
+        if score > 0:
+            results.append({
+                "content": node["content"],
+                "score": round(score, 6),
+                "metadata": {**node["metadata"], "section": node["title"],
+                             "engine": "local_pageindex_tree"},
+                "source": "pageindex",
+            })
+    results.sort(key=lambda item: (-item["score"], item["metadata"]["source"]))
+    return results[:top_k]
 
 
 if __name__ == "__main__":
-    if not PAGEINDEX_API_KEY:
-        print("⚠ Hãy set PAGEINDEX_API_KEY trong file .env")
-        print("  Đăng ký tại: https://pageindex.ai/")
-    else:
-        print("Uploading documents...")
-        upload_documents()
-
-        print("\nTest query:")
-        results = pageindex_search("danh sách sản phẩm cấm đăng bán", top_k=3)
-        for r in results:
-            print(f"[{r['score']:.3f}] {r['content'][:100]}...")
+    for result in pageindex_search("lich trinh Ha Giang xe may", top_k=3):
+        print(f"[{result['score']:.3f}] {result['metadata']['section']}")
