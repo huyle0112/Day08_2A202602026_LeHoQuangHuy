@@ -1,4 +1,4 @@
-# Bài Tập Nhóm — E-commerce Support RAG Chatbot
+# Bài Tập Nhóm — Chủ Đề 5: Trợ Lý Hướng Dẫn Viên Du Lịch Thông Minh
 
 ## Mục Tiêu
 
@@ -79,10 +79,11 @@ Xem code mẫu (DeepEval/RAGAS/TruLens) chi tiết trong `README.md` gốc mục
 
 | Thành viên | MSSV | Nhiệm vụ | Trạng thái |
 |-----------|------|----------|------------|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| Lê Hồ Quang Huy | 2A202602026 | Role 1 (Team Leader & RAG Architect) | Đang thực hiện |
+| Kiều Phúc Huy | 2A202601056 | Role 2 (Data & Dense Search Dev) | Hoàn thành |
+| Nguyễn Nam Phong | 2A202601320 | Role 3 (Sparse Search & Reranking) | Đang thực hiện |
+| Nguyễn Tiến Đạt | 2A202601678 | Role 4 (Frontend & Chatbot Developer) | Đang thực hiện |
+| Lã Phan Hoài An | 2A202601846 | Role 5 (Evaluation & QA Engineer) | Đang thực hiện |
 
 ---
 
