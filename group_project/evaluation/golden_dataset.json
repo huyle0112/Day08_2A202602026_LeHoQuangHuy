@@ -1,17 +1,77 @@
 [
   {
-    "question": "Người mua có thể yêu cầu trả hàng/hoàn tiền trong thời hạn bao lâu sau khi nhận hàng?",
-    "expected_answer": "Trong vòng 15 ngày kể từ khi giao hàng thành công (24 giờ đối với thực phẩm tươi sống/đông lạnh).",
-    "expected_context": "Trang Returns and Refunds Policy, mục Return/Refund Eligibility"
+    "question": "Thời điểm lý tưởng nhất để đi du lịch biển Đồ Sơn, Hải Phòng là vào tháng mấy?",
+    "expected_answer": "Thời điểm đẹp nhất là mùa hè từ tháng 5 đến tháng 8 vì trời nắng, ít mưa. Tuy nhiên nếu muốn xem lễ hội chọi trâu thì nên đi vào tháng 9 (mùng 9/8 Âm lịch).",
+    "expected_context": "Bài viết Cẩm nang du lịch biển Đồ Sơn"
   },
   {
-    "question": "Shopee hỗ trợ những phương thức thanh toán nào?",
-    "expected_answer": "ShopeePay Wallet, thẻ tín dụng/ghi nợ, trả góp qua thẻ, QR Code, chuyển khoản qua app ngân hàng, thẻ NAPAS, Apple Pay, Google Pay, và COD.",
-    "expected_context": "Trang Payment Methods Overview"
+    "question": "Có những hãng xe khách nào đi thẳng từ Hà Nội đến Đồ Sơn?",
+    "expected_answer": "Có các hãng như Hải Âu, Hoàng Long, Limousine Hải Phòng Travel đi thẳng đến Đồ Sơn.",
+    "expected_context": "Bài viết Cẩm nang du lịch biển Đồ Sơn"
   },
   {
-    "question": "Người bán không được đăng bán những sản phẩm nào?",
-    "expected_answer": "Hàng giả/nhái, sản phẩm bất hợp pháp, vi phạm sở hữu trí tuệ, và các mặt hàng nằm trong danh sách cấm của sàn.",
-    "expected_context": "Trang Product Listing Regulations, mục Prohibited Content"
+    "question": "Dinh thự Bảo Đại ở Đồ Sơn được xây dựng từ năm nào và có đặc điểm gì?",
+    "expected_answer": "Dinh thự được xây dựng năm 1928, nằm trên đồi Vung cao 40m. Đây là công trình hình bát giác, kiến trúc Pháp đặc trưng với 2 tầng và 1 hầm.",
+    "expected_context": "Bài viết Cẩm nang du lịch biển Đồ Sơn"
+  },
+  {
+    "question": "Khu du lịch Đồi Rồng ở Đồ Sơn có những bãi tắm và công viên gì?",
+    "expected_answer": "Có bãi biển nhân tạo, công viên nước Thuỷ Tinh, công viên Ánh Sáng Dragon Lighting Park và rừng ngập mặn Dragon Mangrove Forest.",
+    "expected_context": "Bài viết Cẩm nang du lịch biển Đồ Sơn"
+  },
+  {
+    "question": "Khi đến Hà Giang, con đèo nào nổi tiếng nhất mà dân phượt thường chinh phục?",
+    "expected_answer": "Đèo Mã Pì Lèng là con đèo nổi tiếng nhất và nguy hiểm bậc nhất nằm trên con đường Hạnh Phúc nối liền Đồng Văn và Mèo Vạc.",
+    "expected_context": "Cẩm nang du lịch Hà Giang"
+  },
+  {
+    "question": "Thời điểm nào trong năm thích hợp nhất để ngắm hoa tam giác mạch ở Hà Giang?",
+    "expected_answer": "Tháng 10 đến tháng 11 là thời điểm hoa tam giác mạch nở rộ đẹp nhất ở Hà Giang.",
+    "expected_context": "Cẩm nang du lịch Hà Giang"
+  },
+  {
+    "question": "Từ Hà Nội đi Sapa bằng tàu hỏa thì điểm dừng cuối cùng là ga nào?",
+    "expected_answer": "Điểm dừng cuối cùng của tàu hỏa là ga Lào Cai. Sau đó du khách phải đi xe buýt hoặc taxi khoảng 1 tiếng nữa để lên trung tâm thị xã Sapa.",
+    "expected_context": "Cẩm nang du lịch Lào Cai - Sapa"
+  },
+  {
+    "question": "Khu du lịch Tràng An ở Ninh Bình có mấy tuyến đò và mất bao nhiêu thời gian di chuyển?",
+    "expected_answer": "Tràng An thường có 3 tuyến đò chính, mỗi tuyến mất khoảng 2.5 đến 3 tiếng di chuyển qua các hang động và đền đài.",
+    "expected_context": "Cẩm nang du lịch Ninh Bình"
+  },
+  {
+    "question": "Thác Bản Giốc nằm ở tỉnh nào và có điểm gì đặc biệt về biên giới?",
+    "expected_answer": "Thác Bản Giốc nằm ở tỉnh Cao Bằng. Điểm đặc biệt là phần thác chính nằm trên đường biên giới giao điểm giữa Việt Nam và Trung Quốc.",
+    "expected_context": "Cẩm nang du lịch Cao Bằng"
+  },
+  {
+    "question": "Quần đảo Cát Bà thuộc tỉnh nào và phương tiện chính ra đảo là gì?",
+    "expected_answer": "Cát Bà thuộc tỉnh Hải Phòng. Phương tiện chính là đi phà từ bến Gót hoặc đi cáp treo vượt biển.",
+    "expected_context": "Cẩm nang du lịch Hải Phòng Cát Bà"
+  },
+  {
+    "question": "Vịnh Hạ Long có những hang động nổi tiếng nào?",
+    "expected_answer": "Hang Sửng Sốt, Động Thiên Cung, Hang Đầu Gỗ và Hang Luồn là những điểm đến nổi tiếng nhất.",
+    "expected_context": "Cẩm nang du lịch Quảng Ninh"
+  },
+  {
+    "question": "Món đặc sản bánh cuốn chả mực là của địa phương nào?",
+    "expected_answer": "Đây là món đặc sản nổi tiếng của Hạ Long, tỉnh Quảng Ninh.",
+    "expected_context": "Cẩm nang du lịch Quảng Ninh"
+  },
+  {
+    "question": "Lịch trình đi Mộc Châu 2 ngày 1 đêm từ Hà Nội thường có những điểm tham quan nào?",
+    "expected_answer": "Thường ghé Đèo Thung Khe, Rừng thông Bản Áng, Thác Dải Yếm, Đồi chè trái tim và thung lũng mận Nà Ka.",
+    "expected_context": "Cẩm nang du lịch Sơn La Mộc Châu"
+  },
+  {
+    "question": "Mùa lúa chín ở Mù Cang Chải rơi vào tháng mấy?",
+    "expected_answer": "Mùa lúa chín vàng ở Mù Cang Chải đẹp nhất vào giữa tháng 9 đến giữa tháng 10 hàng năm.",
+    "expected_context": "Cẩm nang du lịch Yên Bái Mù Cang Chải"
+  },
+  {
+    "question": "Cách làm thủ tục xin giấy phép đi vào khu vực biên giới khi du lịch Lạng Sơn?",
+    "expected_answer": "Thủ tục xin giấy phép thường cần mang theo CMND/CCCD và làm việc trực tiếp tại đồn biên phòng quản lý khu vực đó.",
+    "expected_context": "Cẩm nang du lịch Lạng Sơn"
   }
 ]
