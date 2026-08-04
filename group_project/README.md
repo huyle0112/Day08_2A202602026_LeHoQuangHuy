@@ -11,12 +11,14 @@ Sau khi hoàn thành bài cá nhân, nhóm ngồi lại để xây dựng **1 tr
 Xây dựng chatbot trả lời câu hỏi về chính sách thương mại điện tử và hỗ trợ khách hàng liên quan.
 
 **Yêu cầu:**
+
 - Giao diện chat (Streamlit / Gradio / Chainlit)
 - Trả lời có citation (dựa trên Task 10)
 - Hỗ trợ follow-up questions (conversation memory)
 - Hiển thị source documents đã dùng
 
 **Stack gợi ý:**
+
 ```
 Chainlit/Streamlit → Retrieval (Task 9) → Generation (Task 10) → Display
 ```
@@ -29,11 +31,11 @@ Sử dụng **1 trong 3 framework** sau để evaluate pipeline RAG của nhóm:
 
 ### Framework lựa chọn
 
-| Framework | Cài đặt | Đặc điểm |
-|-----------|---------|-----------|
+| Framework                                           | Cài đặt               | Đặc điểm                                      |
+| --------------------------------------------------- | ------------------------ | ------------------------------------------------- |
 | [DeepEval](https://github.com/confident-ai/deepeval) | `pip install deepeval` | Nhiều metric built-in, dễ integrate với pytest |
-| [RAGAS](https://github.com/explodinggradients/ragas) | `pip install ragas` | Chuẩn industry cho RAG eval, 3 trục chính |
-| [TruLens](https://github.com/truera/trulens) | `pip install trulens` | Dashboard UI, feedback functions mạnh |
+| [RAGAS](https://github.com/explodinggradients/ragas) | `pip install ragas`    | Chuẩn industry cho RAG eval, 3 trục chính      |
+| [TruLens](https://github.com/truera/trulens)         | `pip install trulens`  | Dashboard UI, feedback functions mạnh            |
 
 ### Yêu cầu Evaluation
 
@@ -69,21 +71,69 @@ Xem code mẫu (DeepEval/RAGAS/TruLens) chi tiết trong `README.md` gốc mục
 
 ## Kiến Trúc Hệ Thống
 
-```
-[Vẽ diagram kiến trúc ở đây]
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#eef2f3', 'edgeLabelBackground':'#fff', 'fontFamily': 'arial', 'clusterBkg': '#f9fbfd', 'clusterBorder': '#cce0ff'}}}%%
+graph TD
+    classDef data fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,rx:10px
+    classDef process fill:#fff3e0,stroke:#fb8c00,stroke-width:2px,rx:10px
+    classDef db fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px
+    classDef logic fill:#e8f5e9,stroke:#43a047,stroke-width:2px,rx:10px
+    classDef output fill:#ffebee,stroke:#e53935,stroke-width:2px,rx:10px
+
+    subgraph "📂 DỮ LIỆU ĐẦU VÀO"
+        A1[📄 Cẩm nang PDF/DOCX]:::data
+        A2[🌐 Bài viết Blogger JSON]:::data
+        B(⚙️ Tiền xử lý & Markdown):::process
+        A1 --> B
+        A2 --> B
+    end
+
+    subgraph "🗄️ LƯU TRỮ VECTOR & TỪ KHOÁ"
+        C[✂️ Chunking 800 ký tự]:::process
+        D1[(🔷 ChromaDB Vector)]:::db
+        D2[(🔠 BM25 Index)]:::db
+        B --> C
+        C --> D1
+        C --> D2
+    end
+
+    subgraph "🔍 LUỒNG TÌM KIẾM HYBRID"
+        U((👤 User)):::output -- "Truy vấn" --> Q[❓ Xử lý câu hỏi]:::process
+        Q --> E1[🧠 Semantic Search]:::logic
+        Q --> E2[⌨️ Lexical Search]:::logic
+      
+        E1 --> D1
+        E2 --> D2
+      
+        D1 --> F{⚖️ Gộp điểm RRF}:::process
+        D2 --> F
+    end
+
+    subgraph "🤖 SINH CÂU TRẢ LỜI"
+        F -- "Điểm >= 0.48" --> G[🔄 Reordering]:::logic
+        F -- "Điểm < 0.48" --> H[📂 PageIndex Fallback]:::process
+        H --> G
+        G[🔄 Reordering] --> I[✨ LLM Sinh Câu Trả Lời]:::output
+        I --> U
+    end
+  
+    subgraph "📱 ỨNG DỤNG & ĐÁNH GIÁ"
+        I -.-> UI[💬 Streamlit Web App]:::data
+        I -.-> Eval[📊 RAGAS Evaluation]:::data
+    end
 ```
 
 ---
 
 ## Phân Công Công Việc
 
-| Thành viên | MSSV | Nhiệm vụ | Trạng thái |
-|-----------|------|----------|------------|
-| Lê Hồ Quang Huy | 2A202602026 | Role 1 (Team Leader & RAG Architect) | Đang thực hiện |
-| Kiều Phúc Huy | 2A202601056 | Role 2 (Data & Dense Search Dev) | Hoàn thành |
-| Nguyễn Nam Phong | 2A202601320 | Role 3 (Sparse Search & Reranking) | Đang thực hiện |
-| Nguyễn Tiến Đạt | 2A202601678 | Role 4 (Frontend & Chatbot Developer) | Đang thực hiện |
-| Lã Phan Hoài An | 2A202601846 | Role 5 (Evaluation & QA Engineer) | Đang thực hiện |
+| Thành viên        | MSSV        | Nhiệm vụ                            | Trạng thái      |
+| ------------------- | ----------- | ------------------------------------- | ----------------- |
+| Lê Hồ Quang Huy   | 2A202602026 | Role 1 (Team Leader & RAG Architect)  | Đang thực hiện |
+| Nguyễn Tiến Đạt | 2A202601056 | Role 2 (Data & Dense Search Dev)      | Hoàn thành      |
+| Nguyễn Nam Phong   | 2A202601320 | Role 3 (Sparse Search & Reranking)    | Đang thực hiện |
+| Kiều Phúc Huy     | 2A202601678 | Role 4 (Frontend & Chatbot Developer) | Đang thực hiện |
+| Lã Phan Hoài An   | 2A202601846 | Role 5 (Evaluation & QA Engineer)     | Đang thực hiện |
 
 ---
 
