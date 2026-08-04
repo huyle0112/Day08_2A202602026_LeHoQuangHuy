@@ -124,7 +124,7 @@ if __name__ == "__main__":
     # ⚠️ MẸO QUAN TRỌNG: 
     # Cắt ngắn bộ dữ liệu để test không bị Rate Limit (429 Too Many Requests)
     # Khi nào ghép code xong thật sự, hãy xoá đoạn [:3] đi để chạy đủ 15 câu!
-    test_dataset = golden_dataset[:3] 
+    test_dataset = golden_dataset # Đã mở khoá toàn bộ 15 câu!
     
     print(f"Đã load {len(golden_dataset)} câu hỏi. Đang test thử {len(test_dataset)} câu đầu tiên.")
 

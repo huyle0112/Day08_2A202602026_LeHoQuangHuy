@@ -127,13 +127,13 @@ graph TD
 
 ## Phân Công Công Việc
 
-| Thành viên        | MSSV        | Nhiệm vụ                            | Trạng thái      |
-| ------------------- | ----------- | ------------------------------------- | ----------------- |
-| Lê Hồ Quang Huy   | 2A202602026 | Role 1 (Team Leader & RAG Architect)  | Đang thực hiện |
-| Nguyễn Tiến Đạt | 2A202601056 | Role 2 (Data & Dense Search Dev)      | Hoàn thành      |
-| Nguyễn Nam Phong   | 2A202601320 | Role 3 (Sparse Search & Reranking)    | Đang thực hiện |
-| Kiều Phúc Huy     | 2A202601678 | Role 4 (Frontend & Chatbot Developer) | Đang thực hiện |
-| Lã Phan Hoài An   | 2A202601846 | Role 5 (Evaluation & QA Engineer)     | Đang thực hiện |
+| Thành viên | MSSV | Nhiệm vụ | Trạng thái |
+|-----------|------|----------|------------|
+| Lê Hồ Quang Huy | 2A202602026 | Role 1 (Team Leader & RAG Architect) | Hoàn thành |
+| Kiều Phúc Huy | 2A202601056 | Role 2 (Data & Dense Search Dev) | Hoàn thành |
+| Nguyễn Nam Phong | 2A202601320 | Role 3 (Sparse Search & Reranking) | Hoàn thành |
+| Nguyễn Tiến Đạt | 2A202601678 | Role 4 (Frontend & Chatbot Developer) | Hoàn thành |
+| Lã Phan Hoài An | 2A202601846 | Role 5 (Evaluation & QA Engineer) | Hoàn thành |
 
 ---
 
