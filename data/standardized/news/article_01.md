@@ -1,7 +1,7 @@
 # Top 10 món ngon phố cổ Hà Nội nhất định phải thử một lần
 
 **Source:** https://mia.vn/cam-nang-du-lich/thuong-thuc-10-mon-ngon-nhat-cua-am-thuc-o-pho-co-ha-noi-2927
-**Crawled:** 2026-08-04T07:59:27.190728+00:00
+**Crawled:** 2026-08-04T08:48:48.062937+00:00
 
 ---
 
@@ -176,16 +176,16 @@ Gối cổ du lịch The Travel Star TC360
 279.000₫
 Top 16 quán phở Hà Nội ngon nức tiếng ăn là ghiền
 25.02.2026
-524,703 lượt xem
+524,719 lượt xem
 20 quán bún chả Hà Nội ngon trứ danh đất Hà Thành
 08.07.2026
-438,644 lượt xem
+438,648 lượt xem
 Phở Bát Đàn - Phở gia truyền 100 năm tuổi tại Hà Nội
 31.07.2026
-221,946 lượt xem
+221,952 lượt xem
 Top 10 quán bánh đúc nóng Hà Nội thơm ngon nức tiếng
 22.01.2025
 157,517 lượt xem
 TOP 10 Quán cafe Hồ Tây view sống ảo cực xịn sò
 22.01.2025
-139,521 lượt xem
+139,525 lượt xem

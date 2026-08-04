@@ -74,6 +74,26 @@ LEGAL_DOCS = [
         "url": "https://catbaexpress.com/kinh-nghiem-du-lich-cat-ba.html",
         "filename": "cam-nang-du-lich-hai-phong-cat-ba.pdf",
     },
+    {
+        "url": "https://vnexpress.net/cam-nang-du-lich-da-nang-4470111.html",
+        "filename": "cam-nang-du-lich-da-nang.pdf",
+    },
+    {
+        "url": "https://vnexpress.net/cam-nang-du-lich-hoi-an-4446174.html",
+        "filename": "cam-nang-du-lich-hoi-an.pdf",
+    },
+    {
+        "url": "https://vnexpress.net/cam-nang-du-lich-nghe-an-4455646.html",
+        "filename": "cam-nang-du-lich-nghe-an.pdf",
+    },
+    {
+        "url": "https://vnexpress.net/nhung-vat-can-mang-theo-khi-di-du-lich-3984515.html",
+        "filename": "vat-dung-can-thiet.pdf",
+    },
+    {
+        "url": "https://sieuthi-go.vn/about-us/cam-nang-mua-sam/huong-dan-chi-tiet-chuan-bi-do-di-du-lich-can-mang-gi-3162.html",
+        "filename": "vat-dung-can-thiet-2.pdf",
+    },
 ]
 
 

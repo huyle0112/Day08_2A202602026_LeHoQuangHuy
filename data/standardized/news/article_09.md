@@ -1,7 +1,7 @@
 # Gợi ý Lịch trình Yên Bái - Nghĩa Lộ - Mù Cang Chải 3 ngày tự túc
 
 **Source:** https://mia.vn/cam-nang-du-lich/goi-y-lich-trinh-yen-bai-nghia-lo-mu-cang-chai-3-ngay-tu-tuc-4350
-**Crawled:** 2026-08-04T07:59:40.575991+00:00
+**Crawled:** 2026-08-04T08:49:42.292400+00:00
 
 ---
 
@@ -163,7 +163,7 @@ Lịch trình phượt Tà Xùa 2N1Đ bằng xe máy đầy đủ và chi tiết
 19,481 lượt xem
 Gợi ý Lịch trình Yên Bái - Nghĩa Lộ - Mù Cang Chải 3 ngày tự túc
 30.10.2024
-19,237 lượt xem
+19,243 lượt xem
 Lịch trình Tà Xùa 2N1Đ tự túc dành cho hội đam mê khám phá
 30.10.2024
 14,237 lượt xem

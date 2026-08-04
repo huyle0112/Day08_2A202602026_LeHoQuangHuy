@@ -15,6 +15,7 @@ loại khỏi danh sách và thay bằng nguồn tương đương hoạt động
 
 import json
 import re
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -24,6 +25,9 @@ from bs4 import BeautifulSoup
 DATA_DIR = Path(__file__).parent.parent / "data" / "landing" / "news"
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) RAGLabBot/1.0"}
+REQUEST_TIMEOUT = (10, 30)  # connect timeout, read timeout (seconds)
+MAX_RETRIES = 3
+RETRY_BACKOFF_SECONDS = 2
 
 
 def setup_directory():
@@ -42,6 +46,11 @@ ARTICLE_URLS = [
     "https://www.ivivu.com/blog/2022/09/review-lang-son-2n1d-diem-den-moi-noi-trong-lang-du-lich/",
     "https://mia.vn/cam-nang-du-lich/goi-y-lich-trinh-yen-bai-nghia-lo-mu-cang-chai-3-ngay-tu-tuc-4350",
     "https://www.ivivu.com/blog/2026/06/cam-nang-du-lich-bien-do-son-hai-phong-tu-a-z/",
+    "https://vnexpress.net/cam-nang-du-lich-da-nang-4470111.html",
+    "https://vnexpress.net/cam-nang-du-lich-hoi-an-4446174.html",
+    "https://vnexpress.net/cam-nang-du-lich-nghe-an-4455646.html",
+    "https://vnexpress.net/nhung-vat-can-mang-theo-khi-di-du-lich-3984515.html",
+    "https://sieuthi-go.vn/about-us/cam-nang-mua-sam/huong-dan-chi-tiet-chuan-bi-do-di-du-lich-can-mang-gi-3162.html",
 ]
 
 
@@ -57,8 +66,21 @@ def crawl_article(url: str) -> dict:
             "content_markdown": str
         }
     """
-    resp = requests.get(url, headers=HEADERS, timeout=20)
-    resp.raise_for_status()
+    last_error = None
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
+            resp.raise_for_status()
+            break
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as exc:
+            last_error = exc
+            if attempt == MAX_RETRIES:
+                raise
+            delay = RETRY_BACKOFF_SECONDS * (2 ** (attempt - 1))
+            print(f"  ! Temporary network error (attempt {attempt}/{MAX_RETRIES}); retrying in {delay}s")
+            time.sleep(delay)
+    else:  # Defensive guard; the loop either breaks or raises above.
+        raise last_error
     soup = BeautifulSoup(resp.text, "html.parser")
 
     # Chỉ loại bỏ những thẻ chắc chắn không chứa nội dung hiển thị trước khi chọn container —
@@ -101,7 +123,12 @@ def crawl_all():
 
     for i, url in enumerate(ARTICLE_URLS, 1):
         print(f"[{i}/{len(ARTICLE_URLS)}] Crawling: {url}")
-        article = crawl_article(url)
+        try:
+            article = crawl_article(url)
+        except requests.exceptions.RequestException as exc:
+            # One unavailable/slow website must not discard successfully crawled articles.
+            print(f"  ! Skipped: {type(exc).__name__}: {exc}")
+            continue
 
         filename = f"article_{i:02d}.json"
         filepath = DATA_DIR / filename
