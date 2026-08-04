@@ -1,7 +1,7 @@
 # Kinh nghiệm du lịch Hà Giang 3 ngày 2 đêm - Vntrip.vn
 
 **Source:** https://www.vntrip.vn/cam-nang/du-lich-ha-giang-tu-tuc-3-ngay-2-dem-3047
-**Crawled:** 2026-08-04T07:59:27.727119+00:00
+**Crawled:** 2026-08-04T08:48:49.158128+00:00
 
 ---
 

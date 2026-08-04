@@ -1,7 +1,7 @@
 # Kinh nghiệm du lịch thác Bản Giốc Cao Bằng chi tiết từ A–Z
 
 **Source:** https://pystravel.vn/tin/6526-kinh-nghiem-du-lich-thac-ban-gioc.html
-**Crawled:** 2026-08-04T07:59:34.777456+00:00
+**Crawled:** 2026-08-04T08:49:10.661242+00:00
 
 ---
 

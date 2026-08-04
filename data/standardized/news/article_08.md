@@ -1,7 +1,7 @@
 # Review Lạng Sơn 2N1Đ – Điểm đến mới nổi trong làng du lịch - iVIVU.com
 
 **Source:** https://www.ivivu.com/blog/2022/09/review-lang-son-2n1d-diem-den-moi-noi-trong-lang-du-lich/
-**Crawled:** 2026-08-04T07:59:38.424337+00:00
+**Crawled:** 2026-08-04T08:49:39.377316+00:00
 
 ---
 
