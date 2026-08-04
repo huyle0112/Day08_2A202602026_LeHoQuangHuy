@@ -18,6 +18,8 @@ CORPUS: list[dict[str, Any]] = []
 _INDEX: Any | None = None
 _TOKENS: list[list[str]] = []
 _SIGNATURE: tuple[tuple[str, int], ...] = ()
+_CHAR_VECTORIZER: Any | None = None
+_CHAR_MATRIX: Any | None = None
 
 
 def tokenize(text: str) -> list[str]:
@@ -57,9 +59,12 @@ def _corpus_signature() -> tuple[tuple[str, int], ...]:
 
 def build_bm25_index(corpus: list[dict[str, Any]]):
     """Build and return a BM25Okapi index for ``corpus``."""
-    global CORPUS, _TOKENS
+    global CORPUS, _TOKENS, _CHAR_VECTORIZER, _CHAR_MATRIX
     CORPUS = list(corpus)
     _TOKENS = [tokenize(str(item.get("content", ""))) for item in CORPUS]
+    # Corpus đổi thì cache character TF-IDF cũng phải được dựng lại ở lần fallback kế tiếp.
+    _CHAR_VECTORIZER = None
+    _CHAR_MATRIX = None
     try:
         from rank_bm25 import BM25Okapi
     except ImportError:
@@ -91,6 +96,36 @@ def _tfidf_scores(query_tokens: list[str]) -> list[float]:
     return scores
 
 
+def _char_tfidf_scores(query: str) -> list[float]:
+    """Score fallback bằng character n-gram khi BM25 không có exact-token match.
+
+    Character n-gram chịu được khác biệt dấu câu, biến thể từ và một phần khác biệt
+    ngôn ngữ tốt hơn word-level BM25. Điểm này chỉ dùng để xếp hạng tương đối; Task 9
+    vẫn dùng cosine score của dense retrieval để quyết định fallback ngoài domain.
+    """
+    global _CHAR_VECTORIZER, _CHAR_MATRIX
+    if not CORPUS:
+        return []
+
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    if _CHAR_VECTORIZER is None or _CHAR_MATRIX is None:
+        _CHAR_VECTORIZER = TfidfVectorizer(
+            analyzer="char_wb",
+            ngram_range=(3, 5),
+            lowercase=True,
+            min_df=1,
+            sublinear_tf=True,
+        )
+        _CHAR_MATRIX = _CHAR_VECTORIZER.fit_transform(
+            [str(item.get("content", "")) for item in CORPUS]
+        )
+
+    query_vector = _CHAR_VECTORIZER.transform([query])
+    return cosine_similarity(query_vector, _CHAR_MATRIX).ravel().tolist()
+
+
 def lexical_search(query: str, top_k: int = 10) -> list[dict[str, Any]]:
     """Return positively matched guide chunks, ranked by BM25 score descending."""
     if not isinstance(query, str) or not query.strip() or top_k <= 0:
@@ -101,8 +136,48 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict[str, Any]]:
         return []
     scores = _INDEX.get_scores(query_tokens) if _INDEX is not None else _tfidf_scores(query_tokens)
     ranked = sorted(enumerate(scores), key=lambda pair: (-float(pair[1]), pair[0]))
+    primary_method = "bm25" if _INDEX is not None else "word_tfidf"
+    selected = [
+        (index, float(score), primary_method)
+        for index, score in ranked
+        if float(score) > 0
+    ][:top_k]
+
+    # Nếu lexical match quá ít, character TF-IDF chỉ bổ sung các vị trí còn thiếu.
+    # Điểm bổ sung được scale thấp hơn BM25 nhỏ nhất để không đảo ưu tiên exact match.
+    if len(selected) < top_k:
+        fallback_scores = _char_tfidf_scores(query)
+        fallback_ranked = sorted(
+            ((index, float(score)) for index, score in enumerate(fallback_scores)
+             if float(score) > 0),
+            key=lambda pair: (-float(pair[1]), pair[0]),
+        )
+        selected_indices = {index for index, _, _ in selected}
+        fallback_ranked = [
+            (index, score) for index, score in fallback_ranked
+            if index not in selected_indices
+        ]
+        missing = top_k - len(selected)
+        fallback_ranked = fallback_ranked[:missing]
+
+        if selected and fallback_ranked:
+            max_fallback = fallback_ranked[0][1]
+            ceiling = min(score for _, score, _ in selected) * 0.5
+            fallback_ranked = [
+                (index, (score / max_fallback) * ceiling)
+                for index, score in fallback_ranked
+            ]
+
+        selected.extend(
+            (index, score, "char_tfidf_fallback")
+            for index, score in fallback_ranked
+        )
+
+    selected.sort(key=lambda item: (-item[1], item[0]))
+
     return [
         {"content": CORPUS[index]["content"], "score": round(float(score), 6),
-         "metadata": dict(CORPUS[index].get("metadata", {}))}
-        for index, score in ranked[:top_k] if float(score) > 0
+         "metadata": {**dict(CORPUS[index].get("metadata", {})),
+                      "retrieval_method": retrieval_method}}
+        for index, score, retrieval_method in selected[:top_k]
     ]

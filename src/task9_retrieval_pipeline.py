@@ -35,10 +35,9 @@ from .task8_pageindex_vectorless import pageindex_search
 # CONFIGURATION
 # =============================================================================
 
-# TODO: Calibrate threshold này bằng cách tự đo điểm cosine của semantic_search
-# cho câu hỏi liên quan vs câu hỏi lạc đề (xem ghi chú ở trên) — ĐỪNG copy nguyên
-# giá trị mẫu, mỗi corpus/embedding model sẽ cho khoảng điểm khác nhau.
-SCORE_THRESHOLD = 0.3   # Nếu best score (cosine gốc) < threshold → fallback PageIndex
+# Với corpus du lịch hiện tại, truy vấn đúng chủ đề thử nghiệm nằm khoảng 0.5 trở lên;
+# dùng 0.48 theo yêu cầu lab để chuyển query yếu/lạc đề sang vectorless fallback.
+SCORE_THRESHOLD = 0.48
 DEFAULT_TOP_K = 5
 RERANK_METHOD = "rrf"  # "cross_encoder" | "mmr" | "rrf"
 
@@ -77,40 +76,49 @@ def retrieve(
             'source': str  # 'hybrid' hoặc 'pageindex'
         }
     """
-    # TODO: Implement full retrieval pipeline
-    #
-    # Step 1: Song song chạy semantic + lexical
-    # dense_results = semantic_search(query, top_k=top_k * 2)
-    # sparse_results = lexical_search(query, top_k=top_k * 2)
-    #
-    # Step 2: Merge bằng RRF
-    # merged = rerank_rrf([dense_results, sparse_results], top_k=top_k * 2)
-    # for item in merged:
-    #     item["source"] = "hybrid"
-    #
-    # Step 3: Rerank
-    # if use_reranking and merged:
-    #     final_results = rerank(query, merged, top_k=top_k, method=RERANK_METHOD)
-    # else:
-    #     final_results = merged[:top_k]
-    #
-    # Step 4: Check threshold DÙNG ĐIỂM COSINE GỐC (dense_results), KHÔNG PHẢI RRF
-    # best_score = dense_results[0]["score"] if dense_results else 0.0
-    # if best_score < score_threshold:
-    #     print(f"  ⚠ Semantic best score ({best_score:.3f}) < threshold ({score_threshold})")
-    #     fallback = pageindex_search(query, top_k=top_k)
-    #     if fallback:
-    #         return fallback
-    #
-    # return final_results[:top_k]
-    raise NotImplementedError("Implement retrieve")
+    if not isinstance(query, str) or not query.strip() or top_k <= 0:
+        return []
+    if not 0.0 <= score_threshold <= 1.0:
+        raise ValueError("score_threshold phải nằm trong khoảng [0, 1].")
+
+    candidate_k = max(top_k * 2, top_k)
+
+    # Dense và sparse dùng hai tín hiệu độc lập. Cosine gốc được giữ riêng để
+    # quyết định fallback; tuyệt đối không so ngưỡng bằng RRF score.
+    dense_results = semantic_search(query.strip(), top_k=candidate_k)
+    sparse_results = lexical_search(query.strip(), top_k=candidate_k)
+    best_dense_score = float(dense_results[0].get("score", 0.0)) if dense_results else 0.0
+
+    merged = rerank_rrf([dense_results, sparse_results], top_k=candidate_k)
+    merged = [{**item, "source": "hybrid"} for item in merged]
+
+    if use_reranking and merged:
+        final_results = rerank(
+            query.strip(),
+            merged,
+            top_k=top_k,
+            method=RERANK_METHOD,
+        )
+    else:
+        final_results = merged[:top_k]
+    final_results = [{**item, "source": "hybrid"} for item in final_results]
+
+    if best_dense_score < score_threshold:
+        fallback_results = pageindex_search(query.strip(), top_k=top_k)
+        if fallback_results:
+            return [
+                {**item, "source": "pageindex"}
+                for item in fallback_results[:top_k]
+            ]
+
+    return final_results[:top_k]
 
 
 if __name__ == "__main__":
     test_queries = [
-        "What payment methods does Shopee support?",
-        "How do I request a return or refund?",
-        "What evidence do I need for a refund request?",
+        "Lịch trình du lịch Hà Giang 3 ngày 2 đêm như thế nào?",
+        "Nên đi Mù Cang Chải vào thời điểm nào?",
+        "Các điểm tham quan nổi bật ở Ninh Bình là gì?",
         "xyzabc123nonsense",  # Query không có kết quả → test fallback
     ]
 
